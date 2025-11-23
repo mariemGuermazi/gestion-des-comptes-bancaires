@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/header :: head"></head>
+<body>
+<div th:replace="/header :: body"></div>
+<div class="container">
+    <h2>Comptes</h2>
+    <table class="table">
+        <thead><tr><th>ID</th><th>Numéro</th><th>Solde</th><th>Type</th><th>Client</th></tr></thead>
+        <tbody>
+        <tr th:each="c : ${comptes}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.numeroCompte}"></td>
+            <td th:text="${c.solde}"></td>
+            <td th:text="${c.getClass().getSimpleName()}"></td>
+            <td th:text="${c.client != null ? c.client.firstName + ' ' + c.client.lastName : '-'}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:replace="/footer :: footer"></div>
+</body>
+</html>

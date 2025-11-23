@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/header :: head"></head>
+<body>
+<div th:replace="/header :: body"></div>
+<div class="container">
+    <h2>Client</h2>
+    <p><strong>Nom:</strong> <span th:text="${client.firstName} + ' ' + ${client.lastName}"/></p>
+    <p><strong>Email:</strong> <span th:text="${client.email}"/></p>
+    <a th:href="@{'/employe/clients/' + ${client.id} + '/comptes'}" class="btn btn-primary">Voir Comptes</a>
+</div>
+<div th:replace="/footer :: footer"></div>
+</body>
+</html>

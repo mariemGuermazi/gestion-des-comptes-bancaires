@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/header :: head"></head>
+<body>
+<div th:replace="/header :: body"></div>
+<div class="container">
+    <h2>Comptes de <span th:text="${client.firstName} + ' ' + ${client.lastName}"></span></h2>
+    <p>
+        <a class="btn btn-success btn-sm" th:href="@{'/employe/comptes/add/courant/' + ${client.id}}">Ajouter Courant</a>
+        <a class="btn btn-success btn-sm" th:href="@{'/employe/comptes/add/epargne/' + ${client.id}}">Ajouter Epargne</a>
+    </p>
+    <table class="table">
+        <thead><tr><th>ID</th><th>Numéro</th><th>Solde</th><th>Type</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="compte : ${comptes}">
+            <td th:text="${compte.id}"></td>
+            <td th:text="${compte.numeroCompte}"></td>
+            <td th:text="${compte.solde}"></td>
+            <td th:text="${compte.getClass().getSimpleName()}"></td>
+            <td>
+                <a class="btn btn-sm btn-danger" th:href="@{'/employe/comptes/delete/' + ${compte.id}}">Supprimer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:replace="/footer :: footer"></div>
+</body>
+</html>

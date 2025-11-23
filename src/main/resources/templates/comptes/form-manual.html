@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/header :: head"></head>
+<body>
+<div th:replace="/header :: body"></div>
+<div class="container">
+    <h2>Créer un compte (manuel)</h2>
+    <form th:action="@{/employe/comptes/add/manual}" method="post">
+        <div class="mb-3"><label>ID client</label><input class="form-control" name="clientId"/></div>
+        <div class="mb-3">
+            <label>Type</label>
+            <select class="form-control" name="type">
+                <option value="courant">Courant</option>
+                <option value="epargne">Epargne</option>
+            </select>
+        </div>
+        <div class="mb-3"><label>Param (découvert ou taux)</label><input class="form-control" name="param"/></div>
+        <button class="btn btn-primary" type="submit">Créer</button>
+    </form>
+</div>
+<div th:replace="/footer :: footer"></div>
+</body>
+</html>
