@@ -1,8 +1,10 @@
-package tn.pi.gestiondescomptesbancaires.service;
+
+/**package tn.pi.gestiondescomptesbancaires.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import tn.pi.gestiondescomptesbancaires.entities.Employe;
+import tn.pi.gestiondescomptesbancaires.model.Employe;
+r
 import tn.pi.gestiondescomptesbancaires.repository.EmployeRepository;
 
 import java.util.List;
@@ -15,4 +17,6 @@ public class EmployeService {
     public Employe saveEmploye(Employe e) { return employeRepository.save(e); }
     public Employe getEmploye(Long id) { return employeRepository.findById(id).orElse(null); }
     public void deleteEmploye(Long id) { employeRepository.deleteById(id); }
-}
+
+}**/
+

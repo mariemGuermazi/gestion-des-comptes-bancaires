@@ -1,20 +1,22 @@
 package tn.pi.gestiondescomptesbancaires.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import tn.pi.gestiondescomptesbancaires.entities.Client;
-import tn.pi.gestiondescomptesbancaires.repository.ClientRepository;
-
+import tn.pi.gestiondescomptesbancaires.model.Client;
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class ClientService {
+public interface ClientService {
 
-    private final ClientRepository clientRepository;
+    Client getClientById(Long clientId);
 
-    public List<Client> getAllClients() { return clientRepository.findAll(); }
-    public Client saveClient(Client c) { return clientRepository.save(c); }
-    public Client getClient(Long id) { return clientRepository.findById(id).orElse(null); }
-    public void deleteClient(Long id) { clientRepository.deleteById(id); }
+    List<Client> getAllClients();
+
+    Client createClient(Client client);
+
+    Client updateClient(Long clientId, Client clientDetails);
+
+    void deleteClient(Long clientId);
+
+    Client getClientByEmail(String email);
+
+    Client saveClient(Client client);
 }
+

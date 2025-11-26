@@ -2,15 +2,12 @@ package tn.pi.gestiondescomptesbancaires.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import tn.pi.gestiondescomptesbancaires.entities.*;
-import tn.pi.gestiondescomptesbancaires.entities.Client;
-import tn.pi.gestiondescomptesbancaires.entities.Compte;
-import tn.pi.gestiondescomptesbancaires.entities.CompteCourant;
-import tn.pi.gestiondescomptesbancaires.entities.CompteEpargne;
-import tn.pi.gestiondescomptesbancaires.repository.ClientRepository;
+import org.springframework.transaction.annotation.Transactional;
+import tn.pi.gestiondescomptesbancaires.model.Compte;
+import tn.pi.gestiondescomptesbancaires.model.Client;
 import tn.pi.gestiondescomptesbancaires.repository.CompteRepository;
+import tn.pi.gestiondescomptesbancaires.repository.ClientRepository;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -20,44 +17,47 @@ public class CompteService {
     private final CompteRepository compteRepository;
     private final ClientRepository clientRepository;
 
-    public List<Compte> getAll() { return compteRepository.findAll(); }
+    @Transactional
+    public Compte createCompteForClient(Long clientId, Compte compte) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client introuvable avec l'ID: " + clientId));
 
-    public List<Compte> getComptesByClient(Long clientId) { return compteRepository.findByClientId(clientId); }
+        compte.setClient(client);
+        compte.setDateCreation(new java.util.Date());
 
-    public Compte createCompteCourant(Long clientId, double decouvert) {
-        Client c = clientRepository.findById(clientId).orElseThrow();
-        CompteCourant cc = new CompteCourant();
-        cc.setClient(c);
-        cc.setNumeroCompte("CC-" + System.currentTimeMillis());
-        cc.setSolde(0);
-        cc.setDateCreation(new Date());
-        cc.setDecouvertAutorise(decouvert);
-        return compteRepository.save(cc);
+        return compteRepository.save(compte);
     }
 
-    public Compte createCompteEpargne(Long clientId, double taux) {
-        Client c = clientRepository.findById(clientId).orElseThrow();
-        CompteEpargne ce = new CompteEpargne();
-        ce.setClient(c);
-        ce.setNumeroCompte("CE-" + System.currentTimeMillis());
-        ce.setSolde(0);
-        ce.setDateCreation(new Date());
-        ce.setTauxInteret(taux);
-        return compteRepository.save(ce);
+    public List<Compte> getComptesByClient(Long clientId) {
+        if (!clientRepository.existsById(clientId)) {
+            throw new RuntimeException("Client introuvable avec l'ID: " + clientId);
+        }
+        return compteRepository.findByClientId(clientId);
     }
 
-    public Compte getCompte(Long id) { return compteRepository.findById(id).orElse(null); }
-    public void deleteCompte(Long id) { compteRepository.deleteById(id); }
-
-    public void deposer(Long id, double montant) {
-        Compte c = compteRepository.findById(id).orElseThrow();
-        c.setSolde(c.getSolde() + montant);
-        compteRepository.save(c);
+    public Compte getCompteById(Long compteId) {
+        return compteRepository.findById(compteId)
+                .orElseThrow(() -> new RuntimeException("Compte introuvable avec l'ID: " + compteId));
     }
 
-    public void retirer(Long id, double montant) {
-        Compte c = compteRepository.findById(id).orElseThrow();
-        c.setSolde(c.getSolde() - montant);
-        compteRepository.save(c);
+    @Transactional
+    public void deleteCompte(Long compteId) {
+        Compte compte = getCompteById(compteId);
+        if (compte.getSolde() != 0) {
+            throw new RuntimeException("Impossible de supprimer un compte avec un solde non nul");
+        }
+        compteRepository.deleteById(compteId);
+    }
+
+    public double getSolde(Long compteId) {
+        return getCompteById(compteId).getSolde();
+    }
+
+    @Transactional
+    public void updateSolde(Long compteId, double montant) {
+        Compte compte = getCompteById(compteId);
+        compte.setSolde(compte.getSolde() + montant);
+        compteRepository.save(compte);
     }
 }
+

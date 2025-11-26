@@ -1,7 +1,9 @@
 package tn.pi.gestiondescomptesbancaires.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import tn.pi.gestiondescomptesbancaires.entities.Compte;
+
+import tn.pi.gestiondescomptesbancaires.model.Compte;
+
 
 import java.util.List;
 

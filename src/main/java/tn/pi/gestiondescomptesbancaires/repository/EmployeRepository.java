@@ -1,7 +1,10 @@
-package tn.pi.gestiondescomptesbancaires.repository;
+
+/**package tn.pi.gestiondescomptesbancaires.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import tn.pi.gestiondescomptesbancaires.entities.Employe;
+import tn.pi.gestiondescomptesbancaires.model.Employe;
 
 public interface EmployeRepository extends JpaRepository<Employe, Long> {
 }
+**/
+
