@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/header :: head"></head>
+<body>
+<div th:replace="/header :: body"></div>
+<div class="container">
+    <h2>Nouvelle transaction</h2>
+    <form th:action="@{/transactions/create}" method="post">
+        <div class="mb-3"><label>Compte (ID)</label><input name="compteId" class="form-control"/></div>
+        <div class="mb-3"><label>Montant</label><input name="montant" class="form-control"/></div>
+        <div class="mb-3">
+            <label>Type</label>
+            <select name="type" class="form-control">
+                <option value="CREDIT">CREDIT</option>
+                <option value="DEBIT">DEBIT</option>
+                <option value="VIREMENT">VIREMENT</option>
+            </select>
+        </div>
+        <div class="mb-3"><label>Description</label><input name="description" class="form-control"/></div>
+        <button class="btn btn-primary" type="submit">Créer</button>
+    </form>
+</div>
+<div th:replace="/footer :: footer"></div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/header :: head"></head>
+<body>
+<div th:replace="/header :: body"></div>
+<div class="container">
+    <h2>Ajouter / Modifier Employé</h2>
+    <form th:action="@{/employes/save}" th:object="${employe}" method="post">
+        <div class="mb-3"><label>Prénom</label><input class="form-control" th:field="*{firstName}"/></div>
+        <div class="mb-3"><label>Nom</label><input class="form-control" th:field="*{lastName}"/></div>
+        <div class="mb-3"><label>Poste</label><input class="form-control" th:field="*{poste}"/></div>
+        <button class="btn btn-primary" type="submit">Enregistrer</button>
+        <a class="btn btn-secondary" th:href="@{/employes}">Annuler</a>
+    </form>
+</div>
+<div th:replace="/footer :: footer"></div>
+</body>
+</html>
