@@ -1,6 +1,7 @@
 package tn.pi.gestiondescomptesbancaires.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import org.springframework.stereotype.Repository;
 import tn.pi.gestiondescomptesbancaires.model.Transaction;
 import tn.pi.gestiondescomptesbancaires.model.TypeTransaction;
@@ -21,3 +22,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByCompteIdAndDateTransactionBetween(Long compteId, Date dateDebut, Date dateFin);
 }
+r

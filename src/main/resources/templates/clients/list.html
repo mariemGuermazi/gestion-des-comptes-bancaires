@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/header :: head"></head>
+<body>
+<div th:replace="/header :: body"></div>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Clients</h2>
+        <div>
+            <a class="btn btn-success" th:href="@{/employe/clients/add}">Ajouter client</a>
+        </div>
+    </div>
+
+    <table class="table table-striped">
+        <thead><tr><th>ID</th><th>Prénom</th><th>Nom</th><th>Email</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="c : ${clients}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.firstName}"></td>
+            <td th:text="${c.lastName}"></td>
+            <td th:text="${c.email}"></td>
+            <td>
+                <a class="btn btn-sm btn-info" th:href="@{'/employe/clients/' + ${c.id} + '/comptes'}">Comptes</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:replace="/footer :: footer"></div>
+</body>
+</html>

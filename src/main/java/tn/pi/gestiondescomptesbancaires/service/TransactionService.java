@@ -7,6 +7,7 @@ import tn.pi.gestiondescomptesbancaires.model.*;
 import tn.pi.gestiondescomptesbancaires.repository.TransactionRepository;
 import tn.pi.gestiondescomptesbancaires.repository.CompteRepository;
 
+
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+
     private final CompteRepository compteRepository;
 
     public List<Transaction> getByCompte(Long compteId) {
@@ -137,3 +139,4 @@ public class TransactionService {
         return transactionRepository.findByCompteClientId(clientId);
     }
 }
+
