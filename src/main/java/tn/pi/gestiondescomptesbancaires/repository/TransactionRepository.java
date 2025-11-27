@@ -22,4 +22,3 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByCompteIdAndDateTransactionBetween(Long compteId, Date dateDebut, Date dateFin);
 }
-r
