@@ -6,18 +6,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
+    // 🔵 Redirection par défaut vers login
     @GetMapping("/")
     public String home() {
-        return "redirect:/login";   // ⬅️ REDIRIGE PAR DÉFAUT
+        return "redirect:/login";
     }
 
-    @GetMapping("/login")
-    public String loginPage() {
-        return "login";  // login.html dans templates/
-    }
-
+    // 🔵 Dashboard employé (existant, pas de conflit)
     @GetMapping("/employe/dashboard")
     public String dashboard() {
-        return "dashboard";
+        return "dashboard"; // dashboard.html
     }
 }
