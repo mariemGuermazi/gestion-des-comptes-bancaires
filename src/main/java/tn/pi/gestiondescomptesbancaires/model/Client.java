@@ -1,10 +1,8 @@
 package tn.pi.gestiondescomptesbancaires.model;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +24,8 @@ public class Client {
 
     @Column(nullable = false, unique = true)
     private String email;
-
     private String telephone;
-
+    private String motDePasse;
     private String adresse;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

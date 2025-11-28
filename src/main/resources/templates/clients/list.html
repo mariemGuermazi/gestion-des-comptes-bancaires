@@ -1,31 +1,44 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/header :: head"></head>
-<body>
-<div th:replace="/header :: body"></div>
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Clients</h2>
-        <div>
-            <a class="btn btn-success" th:href="@{/employe/clients/add}">Ajouter client</a>
-        </div>
-    </div>
+<head>
+    <title>Liste Clients</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-4">
 
-    <table class="table table-striped">
-        <thead><tr><th>ID</th><th>Prénom</th><th>Nom</th><th>Email</th><th>Actions</th></tr></thead>
-        <tbody>
-        <tr th:each="c : ${clients}">
-            <td th:text="${c.id}"></td>
-            <td th:text="${c.firstName}"></td>
-            <td th:text="${c.lastName}"></td>
-            <td th:text="${c.email}"></td>
-            <td>
-                <a class="btn btn-sm btn-info" th:href="@{'/employe/clients/' + ${c.id} + '/comptes'}">Comptes</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div th:replace="/footer :: footer"></div>
+<h2 class="mb-4">Liste des Clients</h2>
+
+<a href="/clients/add" class="btn btn-primary mb-3">+ Ajouter Client</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+    <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Email</th>
+        <th>Téléphone</th>
+        <th>Statut</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="c : ${clients}">
+        <td th:text="${c.id}"></td>
+        <td th:text="${c.nom}"></td>
+        <td th:text="${c.prenom}"></td>
+        <td th:text="${c.email}"></td>
+        <td th:text="${c.telephone}"></td>
+        <td th:text="${c.statut}"></td>
+        <td>
+            <a th:href="@{'/clients/edit/' + ${c.id}}" class="btn btn-sm btn-warning">Modifier</a>
+            <a th:href="@{'/clients/delete/' + ${c.id}}" class="btn btn-sm btn-danger"
+               onclick="return confirm('Supprimer ce client ?')">Supprimer</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
 </body>
 </html>
