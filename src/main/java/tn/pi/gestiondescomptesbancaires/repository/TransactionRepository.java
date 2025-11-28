@@ -13,12 +13,8 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     List<Transaction> findByCompteIdOrderByDateTransactionDesc(Long compteId);
-
     List<Transaction> findByCompteClientId(Long clientId);
-
     List<Transaction> findByType(TypeTransaction type);
-
     List<Transaction> findByDateTransactionBetween(Date dateDebut, Date dateFin);
-
     List<Transaction> findByCompteIdAndDateTransactionBetween(Long compteId, Date dateDebut, Date dateFin);
 }

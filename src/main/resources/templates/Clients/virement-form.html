@@ -1,10 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effectuer un virement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-light">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><i class="fas fa-university"></i> Ma Banque</a>
+    </div>
+</nav>
 
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Messages d'erreur -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exchange-alt"></i> Effectuer un virement
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Informations du compte source -->
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-credit-card"></i> Compte source</h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>N° Compte:</strong> <span th:text="${compte.numeroCompte}"></span></p>
+                                <p><strong>Solde actuel:</strong>
+                                    <span th:text="${#numbers.formatDecimal(compte.solde, 1, 2)} + ' DT'"></span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Solde disponible:</strong>
+                                    <span class="text-success" th:text="${#numbers.formatDecimal(soldeDisponible, 1, 2)} + ' DT'"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vérification si le client a d'autres comptes -->
+                    <div th:if="${autresComptes.isEmpty()}" class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Aucun compte destination disponible.</strong>
+                        <p>Vous devez avoir au moins deux comptes pour effectuer un virement interne.</p>
+                        <a th:href="@{/client/compte/{id}/details(id=${compte.id})}" class="btn btn-secondary mt-2">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </a>
+                    </div>
+
+                    <!-- Formulaire -->
+                    <form th:if="${!autresComptes.isEmpty()}"
+                          th:action="@{/client/compte/{id}/virement(id=${compte.id})}"
+                          method="post"
+                          id="virementForm">
+
+                        <!-- Sélection du compte destination -->
+                        <div class="mb-3">
+                            <label for="compteDestination" class="form-label">
+                                <i class="fas fa-arrow-right"></i> Compte destination *
+                            </label>
+                            <select class="form-select form-select-lg"
+                                    id="compteDestination"
+                                    name="compteDestinationId"
+                                    required>
+                                <option value="">-- Sélectionnez un compte --</option>
+                                <option th:each="c : ${autresComptes}"
+                                        th:value="${c.id}"
+                                        th:data-solde="${c.solde}"
+                                        th:text="${c.numeroCompte + ' - ' +
+                                                     (c.class.simpleName == 'CompteCourant' ? 'Compte Courant' : 'Compte Épargne') +
+                                                     ' (Solde: ' + #numbers.formatDecimal(c.solde, 1, 2) + ' DT)'}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Aperçu du compte destination -->
+                        <div class="alert alert-secondary" id="compteDestInfo" style="display:none;">
+                            <h6><i class="fas fa-info-circle"></i> Compte destination sélectionné</h6>
+                            <p id="destDetails"></p>
+                        </div>
+
+                        <!-- Montant -->
+                        <div class="mb-3">
+                            <label for="montant" class="form-label">
+                                <i class="fas fa-coins"></i> Montant du virement (DT) *
+                            </label>
+                            <input type="number"
+                                   class="form-control form-control-lg"
+                                   id="montant"
+                                   name="montant"
+                                   step="0.01"
+                                   min="0.01"
+                                   th:max="${soldeDisponible}"
+                                   required
+                                   placeholder="Entrez le montant">
+                            <div class="form-text">
+                                Montant maximum: <span th:text="${#numbers.formatDecimal(soldeDisponible, 1, 2)} + ' DT'"></span>
+                            </div>
+                        </div>
+
+                        <!-- Montants rapides -->
+                        <div class="mb-3">
+                            <label class="form-label">Montants rapides:</label>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-outline-warning" onclick="setMontant(50)">50 DT</button>
+                                <button type="button" class="btn btn-outline-warning" onclick="setMontant(100)">100 DT</button>
+                                <button type="button" class="btn btn-outline-warning" onclick="setMontant(200)">200 DT</button>
+                                <button type="button" class="btn btn-outline-warning" onclick="setMontant(500)">500 DT</button>
+                            </div>
+                        </div>
+
+                        <!-- Récapitulatif -->
+                        <div class="alert alert-light border" id="recapitulatif" style="display:none;">
+                            <h5><i class="fas fa-clipboard-list"></i> Récapitulatif du virement</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Compte source:</strong><br>
+                                        <span th:text="${compte.numeroCompte}"></span>
+                                    </p>
+                                    <p><strong>Nouveau solde source:</strong><br>
+                                        <span id="nouveauSoldeSource" class="text-danger">0.00 DT</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Compte destination:</strong><br>
+                                        <span id="compteDestNumero">-</span>
+                                    </p>
+                                    <p><strong>Nouveau solde destination:</strong><br>
+                                        <span id="nouveauSoldeDest" class="text-success">0.00 DT</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="text-center mb-0">
+                                <strong>Montant du virement:
+                                    <span class="text-warning" id="montantVirement">0.00 DT</span>
+                                </strong>
+                            </p>
+                        </div>
+
+                        <!-- Alerte si dépassement -->
+                        <div class="alert alert-danger" id="alerteDepassement" style="display:none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Attention!</strong> Le montant dépasse votre solde disponible.
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg" id="btnConfirmer">
+                                <i class="fas fa-check"></i> Confirmer le virement
+                            </button>
+                            <a th:href="@{/client/compte/{id}/details(id=${compte.id})}"
+                               class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    const soldeActuel = [[${compte.solde}]];
+    const soldeDisponible = [[${soldeDisponible}]];
+    let soldeDest = 0;
+    let compteDestNumero = '';
+
+    function setMontant(montant) {
+        if (montant <= soldeDisponible) {
+            document.getElementById('montant').value = montant;
+            updateRecapitulatif();
+        } else {
+            alert('Ce montant dépasse votre solde disponible!');
+        }
+    }
+
+    document.getElementById('compteDestination').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.value) {
+            soldeDest = parseFloat(selectedOption.getAttribute('data-solde'));
+            compteDestNumero = selectedOption.text.split(' - ')[0];
+            document.getElementById('destDetails').innerHTML = selectedOption.text;
+            document.getElementById('compteDestInfo').style.display = 'block';
+            updateRecapitulatif();
+        } else {
+            document.getElementById('compteDestInfo').style.display = 'none';
+            document.getElementById('recapitulatif').style.display = 'none';
+        }
+    });
+
+    document.getElementById('montant').addEventListener('input', updateRecapitulatif);
+
+    function updateRecapitulatif() {
+        const montant = parseFloat(document.getElementById('montant').value);
+        const destSelected = document.getElementById('compteDestination').value;
+
+        if (montant > 0 && destSelected) {
+            document.getElementById('recapitulatif').style.display = 'block';
+            document.getElementById('montantVirement').textContent = montant.toFixed(2) + ' DT';
+            document.getElementById('nouveauSoldeSource').textContent = (soldeActuel - montant).toFixed(2) + ' DT';
+            document.getElementById('nouveauSoldeDest').textContent = (soldeDest + montant).toFixed(2) + ' DT';
+            document.getElementById('compteDestNumero').textContent = compteDestNumero;
+
+            if (montant > soldeDisponible) {
+                document.getElementById('alerteDepassement').style.display = 'block';
+                document.getElementById('btnConfirmer').disabled = true;
+            } else {
+                document.getElementById('alerteDepassement').style.display = 'none';
+                document.getElementById('btnConfirmer').disabled = false;
+            }
+        } else {
+            document.getElementById('recapitulatif').style.display = 'none';
+        }
+    }
+</script>
 </body>
 </html>

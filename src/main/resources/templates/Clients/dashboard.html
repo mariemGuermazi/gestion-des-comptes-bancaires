@@ -1,10 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Client</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .account-card {
+            border-left: 4px solid #007bff;
+        }
+        .balance-positive {
+            color: #28a745;
+        }
+        .balance-negative {
+            color: #dc3545;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-light">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><i class="fas fa-university"></i> Ma Banque</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/client/{id}/dashboard(id=${client.id})}">
+                        <i class="fas fa-home"></i> Accueil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/client/{id}/comptes(id=${client.id})}">
+                        <i class="fas fa-wallet"></i> Mes Comptes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/client/{id}/profile(id=${client.id})}">
+                        <i class="fas fa-user"></i> Mon Profil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
+<div class="container mt-4">
+    <!-- En-tête de bienvenue -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-primary">
+                <i class="fas fa-user-circle"></i>
+                Bienvenue, <span th:text="${client.prenom + ' ' + client.nom}"></span>
+            </h2>
+            <p class="text-muted">Voici un aperçu de vos comptes bancaires</p>
+        </div>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary card-hover">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-wallet"></i> Nombre de comptes</h5>
+                    <h2 th:text="${comptes.size()}">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success card-hover">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-coins"></i> Solde Total</h5>
+                    <h2 th:text="${#numbers.formatDecimal(comptes.stream().mapToDouble(c -> c.solde).sum(), 1, 2)} + ' DT'">0.00 DT</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info card-hover">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-chart-line"></i> Compte actif</h5>
+                    <h2 th:text="${comptes.isEmpty() ? 'Aucun' : comptes.size() + ' compte(s)'}">N/A</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des comptes -->
+    <div class="row">
+        <div class="col-12">
+            <h4 class="mb-3"><i class="fas fa-list"></i> Mes Comptes</h4>
+
+            <div th:if="${comptes.isEmpty()}" class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> Vous n'avez aucun compte pour le moment.
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3" th:each="compte : ${comptes}">
+                    <div class="card account-card card-hover">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-credit-card"></i>
+                                <span th:text="${compte.class.simpleName == 'CompteCourant' ? 'Compte Courant' : 'Compte Épargne'}"></span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>N° Compte:</strong> <span th:text="${compte.numeroCompte}"></span></p>
+                            <p>
+                                <strong>Solde:</strong>
+                                <span th:class="${compte.solde >= 0 ? 'balance-positive' : 'balance-negative'}">
+                                        <strong th:text="${#numbers.formatDecimal(compte.solde, 1, 2)} + ' DT'"></strong>
+                                    </span>
+                            </p>
+                            <p><strong>Date de création:</strong> <span th:text="${#dates.format(compte.dateCreation, 'dd/MM/yyyy')}"></span></p>
+
+                            <!-- Info spécifique au type de compte -->
+                            <div th:if="${compte.class.simpleName == 'CompteCourant'}">
+                                <p class="text-muted"><i class="fas fa-info-circle"></i> Découvert autorisé:
+                                    <span th:text="${#numbers.formatDecimal(compte.decouvertAutorise, 1, 2)} + ' DT'"></span>
+                                </p>
+                            </div>
+                            <div th:if="${compte.class.simpleName == 'CompteEpargne'}">
+                                <p class="text-muted"><i class="fas fa-percent"></i> Taux d'intérêt:
+                                    <span th:text="${compte.tauxInteret} + '%'"></span>
+                                </p>
+                            </div>
+
+                            <a th:href="@{/client/compte/{id}/transactions(id=${compte.id})}"
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-exchange-alt"></i> Voir les transactions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
