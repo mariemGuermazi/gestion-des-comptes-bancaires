@@ -17,7 +17,7 @@ public class ClientSignupController {
     @GetMapping("/signup")
     public String signupPage(Model model) {
         model.addAttribute("client", new Client());
-        return "auth/signup";
+        return "/signup";
     }
 
     // 🔵 Traitement signup
@@ -31,7 +31,7 @@ public class ClientSignupController {
 
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            return "auth/signup";
+            return "signup";
         }
     }
 }
